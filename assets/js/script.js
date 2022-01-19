@@ -33,7 +33,7 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
+    
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -44,6 +44,7 @@ var loadTasks = function() {
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
+
 
 
 
@@ -90,6 +91,102 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
+
+/// jquery function added here task text clicked
+$(".list-group").on("click", "p", function(){
+  var text = $(this)
+ .text()
+  .trim();
+ 
+  // replace p element with a new text
+  var textInput = $("<textarea>").addClass("form-control").val(text);
+  $(this).replaceWith(textInput);
+ 
+ // auto focus new element
+  textInput.trigger("focus");
+});
+
+$(".list-group").on("blur", "textarea", function() {
+// get current value of textarea
+var text = $(this).val();
+
+
+// get the parent's ul id attribute
+var status = $(this)
+.closet(".list-group")
+.attr("id")
+.replace("list-", "");
+
+// get the task's position in the list of other li elements
+var index = $(this)
+.closet(".list-group-item")
+.index();
+
+
+// update task in array and resave to local storage
+tasks[status][index].text = text;
+saveTasks();
+
+//recreate p element
+var taskP = $("<p>")
+.addClass("m-1")
+.text(text);
+
+// replace textarea with new content
+$(this).replaceWith(taskP);
+});
+
+
+// due date was clicked
+$(".list-group").on("click", "span", function(){
+// get current text
+var date = $(this)
+.text()
+.trim();
+
+// create new input element
+var dateInput = $("<input>")
+.attr("type", "text")
+.addClass("form-control")
+.val(date);
+// swap out elements
+$(this).replaceWith(dateInput);
+
+// automatically focus on new element
+dateInput.trigger("focus");
+
+});
+
+// value of due date was changed
+
+$(".list-group").on("blur", "input[type='text']", function(){
+// get current text
+var date = $(this).val();
+
+//get the parent ul's id attribute
+var status = $(this)
+.closet(".list-group")
+.attr("id")
+.replace("list-", "");
+
+// get the task's position in the list of other li elements
+var index = $(this)
+.closet(".list-group-item")
+.index();
+
+//update task in array to resave to local storage
+tasks[status][index].date = date;
+saveTasks();
+
+// recreate span and insert in place of input element
+var taskSpan = $("<span>")
+.addClass("badge badge-primary badge-pill")
+.text(date);
+$(this).replaceWith(taskSpan);
+
+});
+
+
 
 // load tasks for the first time
 loadTasks();
